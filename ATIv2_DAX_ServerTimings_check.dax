@@ -1,0 +1,38 @@
+﻿// DAX Query
+DEFINE
+	VAR __DS0Core = 
+		SUMMARIZECOLUMNS(
+			ROLLUPADDISSUBTOTAL(
+				'4-5-4 Calendar'[FiscalYear], "IsGrandTotalRowTotal",
+				'4-5-4 Calendar'[FiscalMonthName], "IsDM1Total"
+			),
+			"Customer_Sales", 'Measures Table'[Customer Sales],
+			"Last_Week_s_Sales_4_5_4__DATEADD_", '4-5-4 Calendar'[Last Week's Sales 4-5-4 (DATEADD)],
+			"QTD_Sales__4_5_4_", '4-5-4 Calendar'[QTD Sales (4-5-4)],
+			"MTD_Sales__4_5_4_", '4-5-4 Calendar'[MTD Sales (4-5-4)],
+			"YTD_Sales__4_5_4_", '4-5-4 Calendar'[YTD Sales (4-5-4)],
+			"WoW___Change__4_5_4_", '4-5-4 Calendar'[WoW % Change (4-5-4)]
+		)
+
+	VAR __DS0PrimaryWindowed = 
+		TOPN(
+			502,
+			__DS0Core,
+			[IsGrandTotalRowTotal],
+			0,
+			'4-5-4 Calendar'[FiscalYear],
+			1,
+			[IsDM1Total],
+			0,
+			'4-5-4 Calendar'[FiscalMonthName],
+			1
+		)
+
+EVALUATE
+	__DS0PrimaryWindowed
+
+ORDER BY
+	[IsGrandTotalRowTotal] DESC,
+	'4-5-4 Calendar'[FiscalYear],
+	[IsDM1Total] DESC,
+	'4-5-4 Calendar'[FiscalMonthName]
